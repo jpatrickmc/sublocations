@@ -1,10 +1,24 @@
-import React, { useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { useEffect, useRef, useState } from 'react';
+import { MapContainer, TileLayer, GeoJSON } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
 const Map = () => {
+  const [geodata, setGeodata] = useState(null);
   const mapRef = useRef();
-  const position = [32.75, -97.34];
+  const position = [-1.2921, 36.8219]; // Nairobi coordinates
+
+  useEffect(() => {
+    fetch('/data/nairobi_sublocs.geojson')
+      .then((response) => response.json())
+      .then((data) => {
+        setGeodata(data);
+        console.log('GeoJSON data loaded:', data);
+      })
+      .catch((error) => {
+        console.error('Error fetching GeoJSON data:', error);
+      });
+  }, []);
+
   return (
     <>
       <div style={{ height: '600px' }}>
@@ -20,6 +34,7 @@ const Map = () => {
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+          {geodata && <GeoJSON data={geodata} />}
         </MapContainer>
       </div>
     </>
